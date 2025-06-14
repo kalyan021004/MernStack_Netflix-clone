@@ -36,14 +36,13 @@ app.use(cors({
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
-// Session configuration
 app.use(session({
   secret: process.env.SESSION_SECRET,
   resave: false,
   saveUninitialized: false,
   store: MongoStore.create({
     mongoUrl: process.env.MONGO_URI,
-    ttl: 14 * 24 * 60 * 60, // 14 days expiration
+    ttl: 14 * 24 * 60 * 60,
     autoRemove: "native",
   }),
 }));
@@ -51,40 +50,46 @@ app.use(session({
 app.use(passport.initialize());
 app.use(passport.session());
 
-// API Routes - mount these BEFORE the catch-all route
-app.use("/api/auth", authRoutes);  // Changed from "/" to "/api/auth"
-app.use("/api/titles", titleRoutes); // Changed from "/" to "/api/titles"
+// API Routes
+app.use("/api/auth", authRoutes);
+app.use("/api/titles", titleRoutes);
 
-// Test root route
+// Test routes
 app.get("/", (req, res) => {
   res.send("🌐 Backend Root Route Working!");
 });
 
-// Health check route
 app.get("/health", (req, res) => {
   res.json({ status: "OK", timestamp: new Date().toISOString() });
 });
 
 const __dirname = path.resolve();
 
-// Production static file serving
+// Production static file serving - NO WILDCARDS
 if (process.env.NODE_ENV === "production") {
   app.use(express.static(path.join(__dirname, "/client/build")));
   
-  // Catch-all handler: send back React's index.html file for any non-API routes
-  app.get("*", (req, res, next) => {
-    // Skip API routes - let them handle their own responses
-    if (req.path.startsWith('/api/')) {
-      return next();
+  // Handle specific React routes explicitly (safer approach)
+  const reactRoutes = ['/', '/login', '/register', '/dashboard', '/search', '/profile'];
+  
+  reactRoutes.forEach(route => {
+    app.get(route, (req, res) => {
+      res.sendFile(path.resolve(__dirname, "client", "build", "index.html"));
+    });
+  });
+  
+  // Fallback middleware for any other routes
+  app.use((req, res, next) => {
+    if (!req.path.startsWith('/api/') && req.accepts('html')) {
+      res.sendFile(path.resolve(__dirname, "client", "build", "index.html"));
+    } else {
+      res.status(404).json({ message: "Route not found" });
     }
-    
-    res.sendFile(path.resolve(__dirname, "client", "build", "index.html"));
   });
 }
 
 const PORT = process.env.PORT || 8080;
 
-// Updated MongoDB connection (removed deprecated options)
 mongoose.connect(process.env.MONGO_URI)
   .then(() => {
     console.log("✅ MongoDB connected");
