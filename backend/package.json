@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "main": "app.js",
   "scripts": {
-    "start": "nodemon ap.js"
+    "start": "node ap.js"
   },
   "type": "module",
   "keywords": [],
