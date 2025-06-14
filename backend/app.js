@@ -53,8 +53,8 @@ app.use(passport.initialize());
 app.use(passport.session());
 
 // Mount your routers on appropriate paths
-app.use("/auth", authRoutes);   // It's better to mount under /auth
-app.use("/titles", titleRoutes); // Mount your titles routes on /titles
+app.use("/", authRoutes);   // It's better to mount under /auth
+app.use("/", titleRoutes); // Mount your titles routes on /titles
 
 // Test root route
 app.get("/", (req, res) => {
