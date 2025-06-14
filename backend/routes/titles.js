@@ -4,26 +4,9 @@ import NetflixTitle from "../models/NetflixTitle.js";
 const router = express.Router();
 
 // ✅ Get all movies
-router.get("/movies", async (req, res) => {
-  try {
-    const movies = await NetflixTitle.find({ Genre: /movie/i });
-    res.json(movies);
-  } catch (err) {
-    console.error("Movies fetch error:", err);
-    res.status(500).json({ message: "Server error" });
-  }
-});
+
 
 // ✅ Get all TV shows
-router.get("/tvshows", async (req, res) => {
-  try {
-    const shows = await NetflixTitle.find({ Genre: /tv\s?show/i });
-    res.json(shows);
-  } catch (err) {
-    console.error("TV Shows fetch error:", err);
-    res.status(500).json({ message: "Server error" });
-  }
-});
 
 // ✅ Search by title, director, or genre
 router.get("/search", async (req, res) => {
