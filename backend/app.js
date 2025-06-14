@@ -6,27 +6,28 @@ import bodyParser from "body-parser";
 import cors from "cors";
 import session from "express-session";
 import passport from "passport";
+import dotenv from "dotenv";
 
 import authRoutes from "./routes/auth.js";
 import titleRoutes from "./routes/titles.js";
 import passportConfig from "./passport-config.js";
 
-passportConfig(passport); // call the config function
+dotenv.config(); // Load .env
 
-const PORT = 8080;
-const MONGO_URI = "mongodb+srv://kalyan021004:Netflix021004@netflix.hymtxye.mongodb.net/?retryWrites=true&w=majority&appName=Netflix";
+passportConfig(passport);
 
 const app = express();
 
+// CORS setup
 app.use(cors({
   origin: "http://localhost:5173",
   credentials: true,
 }));
-
 app.use(bodyParser.json());
 
+// Session config
 app.use(session({
-  secret: "yourSecretKey",
+  secret: process.env.SESSION_SECRET,
   resave: false,
   saveUninitialized: false,
 }));
@@ -42,14 +43,15 @@ app.get("/", (req, res) => {
   res.send("I am root Path");
 });
 
-mongoose.connect(MONGO_URI, {
+// DB connection
+mongoose.connect(process.env.MONGO_URI, {
   useNewUrlParser: true,
   useUnifiedTopology: true,
 })
   .then(() => {
     console.log("✅ MongoDB connected");
-    app.listen(PORT, () => {
-      console.log(`🚀 Server running on http://localhost:${PORT}`);
+    app.listen(process.env.PORT, () => {
+      console.log(`🚀 Server running on http://localhost:${process.env.PORT}`);
     });
   })
   .catch((err) => {
