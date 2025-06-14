@@ -7,7 +7,7 @@ function MainScreen() {
   useEffect(() => {
     const fetchHeroMovie = async () => {
       try {
-        const res = await axios.get("http://localhost:8080/hero");
+        const res = await axios.get("https://mern-stack-netflix-clone-uatc.vercel.app/hero");
         setMovie(res.data);
       } catch (err) {
         console.error("Error fetching hero movie:", err);

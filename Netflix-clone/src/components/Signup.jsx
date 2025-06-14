@@ -12,7 +12,7 @@ function SignUp() {
 
     try {
       const res = await axios.post(
-        "http://localhost:8080/register",
+        "https://mern-stack-netflix-clone-uatc.vercel.app/register",
         { email, password },
         { withCredentials: true }
         

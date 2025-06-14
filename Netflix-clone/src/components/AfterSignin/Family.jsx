@@ -15,7 +15,7 @@ function Family() {
   useEffect(() => {
     const fetchMovies = async () => {
       try {
-        const res = await axios.get("http://localhost:8080/genre/family");
+        const res = await axios.get("https://mern-stack-netflix-clone-uatc.vercel.app/genre/family");
         setMovies(res.data);
       } catch (err) {
         console.error("Failed to fetch Family movies:", err);

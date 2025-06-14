@@ -14,7 +14,7 @@ function SignIn() {
 
     try {
       const res = await axios.post(
-        'http://localhost:8080/login',
+        'https://mern-stack-netflix-clone-uatc.vercel.app/login',
         { email, password },
         { withCredentials: true } // important for session cookies
       );

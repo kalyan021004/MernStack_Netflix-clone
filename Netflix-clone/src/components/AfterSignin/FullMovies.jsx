@@ -9,7 +9,7 @@ function FullMovies() {
   useEffect(() => {
     const fetchMovies = async () => {
       try {
-        const res = await axios.get("http://localhost:8080/movies");
+        const res = await axios.get("https://mern-stack-netflix-clone-uatc.vercel.app/movies");
         setMovies(res.data.movies || res.data || []);
       } catch (err) {
         console.error("Error fetching movies:", err);

@@ -15,7 +15,7 @@ function Action() {
   useEffect(() => {
     const fetchActionMovies = async () => {
       try {
-        const res = await axios.get("http://localhost:8080/genre/action");
+        const res = await axios.get("https://mern-stack-netflix-clone-uatc.vercel.app/genre/action");
         setMovies(res.data);
       } catch (err) {
         console.error("Failed to fetch action movies:", err);

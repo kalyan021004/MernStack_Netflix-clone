@@ -12,7 +12,7 @@ function GenrePage() {
   useEffect(() => {
     const fetchTitles = async () => {
       try {
-        const res = await axios.get(`http://localhost:8080/genre/${encodeURIComponent(genre)}`);
+        const res = await axios.get(`https://mern-stack-netflix-clone-uatc.vercel.app/genre/${encodeURIComponent(genre)}`);
         setTitles(res.data);
       } catch (error) {
         console.error("Failed to fetch genre:", error);

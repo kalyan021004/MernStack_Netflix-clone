@@ -9,7 +9,7 @@ function FullTvshows() {
   useEffect(() => {
     const fetchTvShows = async () => {
       try {
-        const res = await axios.get("http://localhost:8080/tvshows");
+        const res = await axios.get("https://mern-stack-netflix-clone-uatc.vercel.app/tvshows");
         setTvshows(res.data.tvshows || res.data || []);
       } catch (err) {
         console.error("Error fetching TV shows:", err);

@@ -15,7 +15,7 @@ function Fantasy() {
   useEffect(() => {
     const fetchMovies = async () => {
       try {
-        const res = await axios.get("http://localhost:8080/genre/fantasy");
+        const res = await axios.get("https://mern-stack-netflix-clone-uatc.vercel.app/genre/fantasy");
         setMovies(res.data);
       } catch (err) {
         console.error("Failed to fetch Fantasy movies:", err);

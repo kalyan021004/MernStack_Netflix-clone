@@ -23,7 +23,7 @@ function SearchResult() {
     const fetchResults = async () => {
       try {
         console.log("Fetching results for:", searchTerm);
-        const res = await axios.get(`http://localhost:8080/search?q=${searchTerm}`);
+        const res = await axios.get(`https://mern-stack-netflix-clone-uatc.vercel.app/search?q=${searchTerm}`);
         console.log("Raw API results:", res.data);
 
         const normalized = res.data.map(item => ({

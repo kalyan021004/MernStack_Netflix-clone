@@ -15,7 +15,7 @@ function Crime() {
   useEffect(() => {
     const fetchMovies = async () => {
       try {
-        const res = await axios.get("http://localhost:8080/genre/crime");
+        const res = await axios.get("https://mern-stack-netflix-clone-uatc.vercel.app/genre/crime");
         setMovies(res.data);
       } catch (err) {
         console.error("Failed to fetch Crime movies:", err);

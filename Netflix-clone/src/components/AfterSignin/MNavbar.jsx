@@ -29,7 +29,7 @@ function MNavbar() {
 
   const handleLogout = async () => {
     try {
-      await axios.post("http://localhost:8080/logout", {}, { withCredentials: true });
+      await axios.post("https://mern-stack-netflix-clone-uatc.vercel.app/logout", {}, { withCredentials: true });
       alert("Logged out successfully");
       navigate("/");
     } catch (err) {

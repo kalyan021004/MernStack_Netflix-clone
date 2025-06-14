@@ -15,7 +15,7 @@ function Biography() {
   useEffect(() => {
     const fetchMovies = async () => {
       try {
-        const res = await axios.get("http://localhost:8080/genre/biography");
+        const res = await axios.get("https://mern-stack-netflix-clone-uatc.vercel.app/genre/biography");
         setMovies(res.data);
       } catch (err) {
         console.error("Failed to fetch Biography movies:", err);
