@@ -5,6 +5,11 @@
   "scripts": {
     "start": "node ap.js"
   },
+  
+  "overrides": {
+    "path-to-regexp": "^6.2.1"
+  },
+
   "type": "module",
   "keywords": [],
   "author": "",
