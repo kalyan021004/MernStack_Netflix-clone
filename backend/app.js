@@ -1,10 +1,9 @@
-// app.js
-
 import express from "express";
 import mongoose from "mongoose";
 import bodyParser from "body-parser";
 import cors from "cors";
 import session from "express-session";
+import MongoStore from "connect-mongo"; // Add this for production session store
 import passport from "passport";
 import dotenv from "dotenv";
 import path from "path";
@@ -13,16 +12,15 @@ import authRoutes from "./routes/auth.js";
 import titleRoutes from "./routes/titles.js";
 import passportConfig from "./passport-config.js";
 
-dotenv.config(); // Load .env variables
+dotenv.config();
 
 const app = express();
 
-// Passport config
 passportConfig(passport);
 
-// Allow CORS for frontend (Vercel and local)
 const allowedOrigins = [
-  "http://localhost:5173"
+  "http://localhost:5173",
+  // add production frontend URL here if any, e.g., "https://yourdomain.com"
 ];
 
 app.use(cors({
@@ -36,32 +34,35 @@ app.use(cors({
   credentials: true,
 }));
 
-// Middleware
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
-// Sessions
+// Use connect-mongo for storing sessions in MongoDB (production-safe)
 app.use(session({
   secret: process.env.SESSION_SECRET,
   resave: false,
   saveUninitialized: false,
+  store: MongoStore.create({
+    mongoUrl: process.env.MONGO_URI,
+    ttl: 14 * 24 * 60 * 60, // 14 days expiration
+    autoRemove: "native",
+  }),
 }));
 
-// Initialize passport
 app.use(passport.initialize());
 app.use(passport.session());
 
-// Routes
-app.use("/", authRoutes);
-app.use("/", titleRoutes);
+// Mount your routers on appropriate paths
+app.use("/auth", authRoutes);   // It's better to mount under /auth
+app.use("/titles", titleRoutes); // Mount your titles routes on /titles
 
-// Test route
+// Test root route
 app.get("/", (req, res) => {
   res.send("🌐 Backend Root Route Working!");
 });
 
-// Serve React static build in production
 const __dirname = path.resolve();
+
 if (process.env.NODE_ENV === "production") {
   app.use(express.static(path.join(__dirname, "/client/build")));
   app.get("*", (req, res) => {
@@ -69,7 +70,6 @@ if (process.env.NODE_ENV === "production") {
   });
 }
 
-// MongoDB connection and server start
 const PORT = process.env.PORT || 8080;
 mongoose.connect(process.env.MONGO_URI, {
   useNewUrlParser: true,
