@@ -19,8 +19,7 @@ const app = express();
 passportConfig(passport);
 
 const allowedOrigins = [
-  "http://localhost:5173",
-  // add production frontend URL here if any, e.g., "https://yourdomain.com"
+  "http://localhost:5173"
 ];
 
 app.use(cors({
@@ -31,32 +30,28 @@ app.use(cors({
       callback(new Error("Not allowed by CORS"));
     }
   },
-  credentials: true,
+  credentials: true
 }));
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
-// Use connect-mongo for storing sessions in MongoDB (production-safe)
 app.use(session({
   secret: process.env.SESSION_SECRET,
   resave: false,
   saveUninitialized: false,
   store: MongoStore.create({
     mongoUrl: process.env.MONGO_URI,
-    ttl: 14 * 24 * 60 * 60, // 14 days expiration
-    autoRemove: "native",
+    ttl: 14 * 24 * 60 * 60, 
+    autoRemove: "native"
   }),
 }));
 
 app.use(passport.initialize());
 app.use(passport.session());
 
-// Mount your routers on appropriate paths
-app.use("/", authRoutes);   // It's better to mount under /auth
-app.use("/", titleRoutes); // Mount your titles routes on /titles
-
-// Test root route
+app.use("/", authRoutes);  
+app.use("/", titleRoutes); 
 app.get("/", (req, res) => {
   res.send("🌐 Backend Root Route Working!");
 });
@@ -65,7 +60,7 @@ const __dirname = path.resolve();
 
 if (process.env.NODE_ENV === "production") {
   app.use(express.static(path.join(__dirname, "/client/build")));
-  app.get("/*", (req, res) => {
+  app.get("*", (req, res) => {
     res.sendFile(path.resolve(__dirname, "client", "build", "index.html"));
   });
 }

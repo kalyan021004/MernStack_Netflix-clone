@@ -3,12 +3,6 @@ import NetflixTitle from "../models/NetflixTitle.js";
 
 const router = express.Router();
 
-// ✅ Get all movies
-
-
-// ✅ Get all TV shows
-
-// ✅ Search by title, director, or genre
 router.get("/search", async (req, res) => {
   const query = req.query.q;
 
@@ -43,7 +37,6 @@ router.get("/search", async (req, res) => {
   }
 });
 
-// ✅ Get titles by genre
 router.get("/genre/:genre", async (req, res) => {
   const genre = req.params.genre;
 
@@ -67,7 +60,6 @@ router.get("/genre/:genre", async (req, res) => {
   }
 });
 
-// ✅ Hero movie
 router.get("/hero", async (req, res) => {
   try {
     const topMovie = await NetflixTitle.findOne().sort({ IMDB_Rating: -1 });

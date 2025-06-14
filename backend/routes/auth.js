@@ -46,9 +46,6 @@ router.post("/logout", (req, res, next) => {
   });
 });
 
-router.get("/me", (req, res) => {
-  if (!req.isAuthenticated()) return res.status(401).json({ message: "Not authenticated" });
-  res.json({ id: req.user._id, email: req.user.email });
-});
+
 
 export default router;
