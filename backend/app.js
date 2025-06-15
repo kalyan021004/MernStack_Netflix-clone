@@ -7,6 +7,7 @@ import MongoStore from "connect-mongo";
 import passport from "passport";
 import dotenv from "dotenv";
 import path from "path";
+import { fileURLToPath } from "url";
 
 import authRoutes from "./routes/auth.js";
 import titleRoutes from "./routes/titles.js";
@@ -15,12 +16,10 @@ import passportConfig from "./passport-config.js";
 dotenv.config();
 
 const app = express();
-
 passportConfig(passport);
 
 const allowedOrigins = [
   "https://mernstack-netflix-clone-1.onrender.com"
-  
 ];
 
 app.use(cors({
@@ -56,35 +55,25 @@ app.use("/api/auth", authRoutes);
 app.use("/api/titles", titleRoutes);
 
 // Test routes
-app.get("/", (req, res) => {
-  res.send("🌐 Backend Root Route Working!");
-});
-
 app.get("/health", (req, res) => {
   res.json({ status: "OK", timestamp: new Date().toISOString() });
 });
 
-const __dirname = path.resolve();
+// --- Serve frontend build ---
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
-// Production static file serving - NO WILDCARDS
 if (process.env.NODE_ENV === "production") {
-  app.use(express.static(path.join(__dirname, "/client/build")));
-  
-  // Handle specific React routes explicitly (safer approach)
-  const reactRoutes = ['/', '/login', '/register', '/dashboard', '/search', '/profile'];
-  
-  reactRoutes.forEach(route => {
-    app.get(route, (req, res) => {
-      res.sendFile(path.resolve(__dirname, "client", "build", "index.html"));
-    });
-  });
-  
-  // Fallback middleware for any other routes
-  app.use((req, res, next) => {
-    if (!req.path.startsWith('/api/') && req.accepts('html')) {
-      res.sendFile(path.resolve(__dirname, "client", "build", "index.html"));
+  const clientBuildPath = path.join(__dirname, "../client/build");
+
+  app.use(express.static(clientBuildPath));
+
+  // Handle React routes (fallback)
+  app.get("*", (req, res) => {
+    if (!req.path.startsWith("/api")) {
+      res.sendFile(path.join(clientBuildPath, "index.html"));
     } else {
-      res.status(404).json({ message: "Route not found" });
+      res.status(404).json({ message: "API route not found" });
     }
   });
 }

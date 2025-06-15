@@ -3,7 +3,8 @@
   "version": "1.0.0",
   "main": "app.js",
   "scripts": {
-    "start": "node ap.js"
+    "start": "node app.js",
+    "build":"vite build"
   },
   "overrides": {
     "path-to-regexp": "^6.2.1"
