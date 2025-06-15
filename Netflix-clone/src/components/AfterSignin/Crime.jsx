@@ -3,33 +3,39 @@ import axios from "axios";
 import CardComponent from "./CardComponent";
 import { useNavigate } from "react-router-dom";
 
-const fallbackImageUrl = "https://via.placeholder.com/300x400?text=No+Image";
-
 function Crime() {
   const [movies, setMovies] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-
+  
   const navigate = useNavigate();
+  const API_URL = "https://mernstack-netflix-clone-cpvy.onrender.com";
 
   useEffect(() => {
     const fetchMovies = async () => {
       try {
-        const res = await axios.get("https://mern-stack-netflix-clone-uatc.vercel.app/genre/crime");
+        const res = await axios.get(`${API_URL}/api/titles/genre/crime`, {
+          withCredentials: true
+        });
         setMovies(res.data);
       } catch (err) {
         console.error("Failed to fetch Crime movies:", err);
         setError("Failed to load Crime movies.");
+        
+        // Handle authentication errors
+        if (err.response?.status === 401) {
+          navigate('/signin');
+        }
       } finally {
         setLoading(false);
       }
     };
 
     fetchMovies();
-  }, []);
+  }, [API_URL, navigate]);
 
   const handleShowMore = () => {
-    navigate("/genre/Crime");
+    navigate("/genre/crime");
   };
 
   return (
@@ -50,15 +56,15 @@ function Crime() {
       )}
 
       <div className="row g-2">
-        {movies.slice(0, 6).map((movie) => (
-          <div className="col-2" key={movie._id || movie.title}>
+        {movies.slice(0, 6).map((movie, index) => (
+          <div className="col-2" key={movie.id || movie._id || `${movie.title}-${index}`}>
             <CardComponent
-              title={movie.title || movie.Series_Title}
-              description={movie.description || movie.Description}
-              release_year={movie.release_year || movie.Release_Year}
-              duration={movie.duration || movie.Duration}
-              rating={movie.rating || movie.IMDB_Rating}
-              posterUrl={movie.posterUrl || movie.Poster_Link || fallbackImageUrl}
+              title={movie.title}
+              description={movie.description}
+              release_year={movie.release_year}
+              duration={movie.duration}
+              rating={movie.rating}
+              posterUrl={movie.posterUrl}
             />
           </div>
         ))}

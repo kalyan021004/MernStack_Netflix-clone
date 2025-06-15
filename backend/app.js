@@ -20,6 +20,7 @@ passportConfig(passport);
 
 const allowedOrigins = [
   "http://localhost:5173"
+  
 ];
 
 app.use(cors({

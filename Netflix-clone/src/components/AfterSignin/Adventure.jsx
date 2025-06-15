@@ -12,24 +12,34 @@ function Adventure() {
 
   const navigate = useNavigate();
 
+  // API URL configuration
+const API_URL ="https://mernstack-netflix-clone-cpvy.onrender.com";
+
   useEffect(() => {
     const fetchMovies = async () => {
       try {
-        const res = await axios.get("https://mern-stack-netflix-clone-uatc.vercel.app/genre/adventure");
+        const res = await axios.get(`${API_URL}/api/titles/genre/adventure`, {
+          withCredentials: true
+        });
         setMovies(res.data);
       } catch (err) {
         console.error("Failed to fetch Adventure movies:", err);
         setError("Failed to load Adventure movies.");
+        z
+        // Handle authentication errors
+        if (err.response?.status === 401) {
+          navigate('/signin');
+        }
       } finally {
         setLoading(false);
       }
     };
 
     fetchMovies();
-  }, []);
+  }, [API_URL, navigate]);
 
   const handleShowMore = () => {
-    navigate("/genre/Adventure");
+    navigate("/genre/adventure");
   };
 
   return (
@@ -51,14 +61,14 @@ function Adventure() {
 
       <div className="row g-2">
         {movies.slice(0, 6).map((movie) => (
-          <div className="col-2" key={movie._id || movie.title}>
+          <div className="col-2" key={movie.title}>
             <CardComponent
-              title={movie.title || movie.Series_Title}
-              description={movie.description || movie.Description}
-              release_year={movie.release_year || movie.Release_Year}
-              duration={movie.duration || movie.Duration}
-              rating={movie.rating || movie.IMDB_Rating}
-              posterUrl={movie.posterUrl || movie.Poster_Link || fallbackImageUrl}
+              title={movie.title}
+              description={movie.description}
+              release_year={movie.release_year}
+              duration={movie.duration}
+              rating={movie.rating}
+              posterUrl={movie.posterUrl || fallbackImageUrl}
             />
           </div>
         ))}

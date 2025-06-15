@@ -1,43 +1,48 @@
 import React, { useEffect, useState } from "react";
-import { useLocation } from "react-router-dom";
 import axios from "axios";
-import SearchResultItem from "./SearchResultItem";
 import MNavbar from "./MNavbar";
+import SearchResultItem from "./SearchResultItem";
 
-const fallbackImageUrl = "https://via.placeholder.com/300x400?text=No+Image";
-
-function useQuery() {
-  return new URLSearchParams(useLocation().search);
-}
 
 function SearchResult() {
-  const query = useQuery();
-  const searchTerm = query.get("q");
+  const [searchTerm, setSearchTerm] = useState("");
   const [results, setResults] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+  const API_URL ="https://mernstack-netflix-clone-cpvy.onrender.com";
+
+  // Get search query from URL params on mount
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const q = params.get("q") || "";
+    setSearchTerm(q);
+  }, []);
 
   useEffect(() => {
-    if (!searchTerm) {
-      console.log("No search term found");
+    if (!searchTerm.trim()) {
+      setResults([]);
       return;
     }
+
     const fetchResults = async () => {
+      setLoading(true);
+      setError(null);
       try {
-        console.log("Fetching results for:", searchTerm);
-        const res = await axios.get(`https://mern-stack-netflix-clone-uatc.vercel.app/search?q=${searchTerm}`);
-        console.log("Raw API results:", res.data);
-
-        const normalized = res.data.map(item => ({
+        const res = await axios.get(`${API_URL}/api/titles/search?q=${encodeURIComponent(searchTerm)}`);
+        const normalized = res.data.map((item) => ({
           title: item.Series_Title || item.title,
-          description: item.Description || item.description,
+          description: item.Description || item.description || "No description available.",
           release_year: item.Release_Year || item.release_year,
-          duration: item.Duration || item.duration,
-          rating: item.IMDB_Rating || item.rating,
-          posterUrl: item.Poster_Link || item.posterUrl || fallbackImageUrl
+          duration: item.Duration || item.duration || "N/A",
+          rating: item.IMDB_Rating || item.rating || "N/A",
+          posterUrl: item.Poster_Link || item.posterUrl,
         }));
-
         setResults(normalized);
       } catch (err) {
-        console.error("Error fetching search results:", err);
+        console.error("Search fetch failed:", err);
+        setError("Failed to fetch search results.");
+      } finally {
+        setLoading(false);
       }
     };
 
@@ -48,20 +53,28 @@ function SearchResult() {
     <>
       <MNavbar />
       <div className="container py-4">
-        {results.length > 0 ? (
-          results.map((item, index) => (
-            <SearchResultItem
-              key={index}
-              title={item.title}
-              description={item.description}
-              release_year={item.release_year}
-              duration={item.duration}
-              rating={item.rating}
-              posterUrl={item.posterUrl}
-            />
-          ))
+        {!searchTerm.trim() ? (
+          <p className="text-white">Please enter a search term.</p>
         ) : (
-          <p className="text-white">No results found.</p>
+          <>
+            <h2 className="text-white mb-3">
+              Search Results for "{searchTerm}"
+            </h2>
+            {loading && <p className="text-white">Loading...</p>}
+            {error && <p className="text-danger">{error}</p>}
+            {!loading && !error && results.length === 0 && (
+              <p className="text-white">No results found.</p>
+            )}
+            <div className="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-3">
+              {!loading &&
+                !error &&
+                results.map((item, index) => (
+                  <div className="col" key={`${item.title}-${index}`}>
+                    <SearchResultItem {...item} />
+                  </div>
+                ))}
+            </div>
+          </>
         )}
       </div>
     </>

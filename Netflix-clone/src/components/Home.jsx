@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import Header from './Header'
+import Header from './header'
 import Mainhero from './MainHero'
 import Trending from './Trending'
 import SecondaryHero from './SecondaryHero'

@@ -3,19 +3,19 @@ import axios from "axios";
 import CardComponent from "./CardComponent";
 import { useNavigate } from "react-router-dom";
 
-const fallbackImageUrl = "https://via.placeholder.com/300x400?text=No+Image";
 
 function History() {
   const [movies, setMovies] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-
+  
+  const API_URL ="https://mernstack-netflix-clone-cpvy.onrender.com";
   const navigate = useNavigate();
 
   useEffect(() => {
     const fetchMovies = async () => {
       try {
-        const res = await axios.get("https://mern-stack-netflix-clone-uatc.vercel.app/genre/history");
+        const res = await axios.get(`${API_URL}/api/titles/genre/history`);
         setMovies(res.data);
       } catch (err) {
         console.error("Failed to fetch History movies:", err);
@@ -29,7 +29,7 @@ function History() {
   }, []);
 
   const handleShowMore = () => {
-    navigate("/genre/History");
+    navigate("/genre/history");
   };
 
   return (
@@ -53,12 +53,12 @@ function History() {
         {movies.slice(0, 6).map((movie) => (
           <div className="col-2" key={movie._id || movie.title}>
             <CardComponent
-              title={movie.title || movie.Series_Title}
-              description={movie.description || movie.Description}
-              release_year={movie.release_year || movie.Release_Year}
-              duration={movie.duration || movie.Duration}
-              rating={movie.rating || movie.IMDB_Rating}
-              posterUrl={movie.posterUrl || movie.Poster_Link || fallbackImageUrl}
+              title={movie.title}
+              description={movie.description}
+              release_year={movie.release_year}
+              duration={movie.duration}
+              rating={movie.rating}
+              posterUrl={movie.posterUrl}
             />
           </div>
         ))}

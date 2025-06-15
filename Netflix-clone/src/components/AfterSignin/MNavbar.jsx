@@ -5,32 +5,18 @@ import { Link, useNavigate } from "react-router-dom";
 function MNavbar() {
   const [searchQuery, setSearchQuery] = useState("");
   const navigate = useNavigate();
-
+   const API_URL ="https://mernstack-netflix-clone-cpvy.onrender.com";
   const genres = [
-    "Action",
-    "Adventure",
-    "Animation",
-    "Biography",
-    "Comedy",
-    "Crime",
-    "Drama",
-    "Family",
-    "Fantasy",
-    "History",
-    "Horror",
-    "Music",
-    "Mystery",
-    "Romance",
-    "Sci-Fi",
-    "Thriller",
-    "War",
-    "Western",
+    "Action", "Adventure", "Animation", "Biography", "Comedy", "Crime",
+    "Drama", "Family", "Fantasy", "History", "Horror", "Music", "Mystery",
+    "Romance", "Sci-Fi", "Thriller", "War", "Western",
   ];
 
   const handleLogout = async () => {
     try {
-      await axios.post("https://mern-stack-netflix-clone-uatc.vercel.app/logout", {}, { withCredentials: true });
+      await axios.post(`${API_URL}/api/auth/logout`, {}, { withCredentials: true }); // ✅ API_URL used
       alert("Logged out successfully");
+      localStorage.removeItem("userToken"); // ✅ Optional: clean token
       navigate("/");
     } catch (err) {
       alert("Logout failed");
@@ -40,13 +26,11 @@ function MNavbar() {
 
   const handleSearch = (e) => {
     e.preventDefault();
-    if (searchQuery.trim()) {
-      navigate(`/search?q=${encodeURIComponent(searchQuery.trim())}`);
+    const trimmed = searchQuery.trim();
+    if (trimmed) {
+      navigate(`/search?q=${encodeURIComponent(trimmed)}`);
+      setSearchQuery("");
     }
-  };
-
-  const handleGenreClick = (genre) => {
-    navigate(`/genre/${encodeURIComponent(genre)}`);
   };
 
   return (
@@ -69,8 +53,6 @@ function MNavbar() {
 
       <div className="collapse navbar-collapse" id="navbarNav">
         <ul className="navbar-nav me-auto mb-2 mb-lg-0">
-
-          {/* Genre Dropdown */}
           <li className="nav-item dropdown">
             <span
               className="nav-link dropdown-toggle"
@@ -85,13 +67,9 @@ function MNavbar() {
             <ul className="dropdown-menu" aria-labelledby="genreDropdown">
               {genres.map((genre) => (
                 <li key={genre}>
-                  <span
-                    className="dropdown-item"
-                    style={{ cursor: "pointer" }}
-                    onClick={() => handleGenreClick(genre)}
-                  >
+                  <Link className="dropdown-item" to={`/genre/${encodeURIComponent(genre.toLowerCase())}`}>
                     {genre}
-                  </span>
+                  </Link>
                 </li>
               ))}
             </ul>
