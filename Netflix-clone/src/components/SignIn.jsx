@@ -91,7 +91,7 @@ function SignIn() {
             </button>
           </form>
           <div className="mt-3 text-secondary" style={{ fontSize: '0.9rem' }}>
-            New to Netflix? <a href="/signup" className="text-white text-decoration-none">Sign up now.</a>
+            New to Netflix? <a href="/register" className="text-white text-decoration-none">Sign up now.</a>
           </div>
           <div className="mt-2 text-secondary" style={{ fontSize: '0.8rem' }}>
             This page is protected by Google reCAPTCHA to ensure you're not a bot.

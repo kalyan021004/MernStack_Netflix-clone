@@ -21,7 +21,7 @@ function Mainhero() {
               />
             </div>
             <div className="col-md-auto col-12">
-              <a href='/signup' type="submit" className="btn btn-danger btn-lg w-100">
+              <a href='/register' type="submit" className="btn btn-danger btn-lg w-100">
                 Get Started
               </a>
             </div>
