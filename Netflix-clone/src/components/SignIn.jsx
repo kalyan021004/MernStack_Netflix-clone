@@ -12,7 +12,8 @@ function SignIn() {
   const navigate = useNavigate();
 
   // API URL configuration
-const API_URL ="https://mernstack-netflix-clone-cpvy.onrender.com";
+  const API_URL = "https://mernstack-netflix-clone-cpvy.onrender.com";
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
@@ -20,10 +21,15 @@ const API_URL ="https://mernstack-netflix-clone-cpvy.onrender.com";
 
     try {
       const res = await axios.post(
-        `${API_URL}/api/auth/login`,  // Using dynamic API URL
+        `${API_URL}/api/auth/login`,
         { email, password },
         { withCredentials: true }
       );
+
+      // Store user data in localStorage if provided
+      if (res.data.user) {
+        localStorage.setItem('user', JSON.stringify(res.data.user));
+      }
 
       alert(res.data.message);
       navigate('/home');
@@ -57,7 +63,7 @@ const API_URL ="https://mernstack-netflix-clone-cpvy.onrender.com";
               <input
                 type="email"
                 className="form-control bg-secondary text-white border-0"
-                placeholder="Email or phone number"
+                placeholder="Email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required

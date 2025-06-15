@@ -7,24 +7,26 @@ import Header from './header';
 function SignUp() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [username, setUsername] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const navigate = useNavigate();
 
-  // Fixed: Remove extra space at the end and use consistent URL
-const API_URL ="https://mernstack-netflix-clone-cpvy.onrender.com";
+  // API URL configuration
+  const API_URL = "https://mernstack-netflix-clone-cpvy.onrender.com";
+
   const handleRegister = async (e) => {
     e.preventDefault();
     setLoading(true);
     setError(null);
 
     try {
-      // Fixed: Remove the extra $ and use the API_URL constant
       const res = await axios.post(
         `${API_URL}/api/auth/register`,
-        { email, password },
+        { email, password, username },
         { withCredentials: true }
       );
+      
       alert(res.data.message);
       navigate('/signin');
     } catch (err) {
@@ -68,11 +70,22 @@ const API_URL ="https://mernstack-netflix-clone-cpvy.onrender.com";
             <div className="mb-3">
               <input
                 className="form-control bg-secondary text-white border-0"
+                type="text"
+                value={username}
+                placeholder="Username (optional)"
+                onChange={(e) => setUsername(e.target.value)}
+                autoComplete="name"
+              />
+            </div>
+            <div className="mb-3">
+              <input
+                className="form-control bg-secondary text-white border-0"
                 type="password"
                 value={password}
-                placeholder="Password"
+                placeholder="Password (min 6 characters)"
                 onChange={(e) => setPassword(e.target.value)}
                 required
+                minLength="6"
                 autoComplete="new-password"
               />
             </div>

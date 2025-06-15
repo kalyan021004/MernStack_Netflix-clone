@@ -20,7 +20,6 @@ passportConfig(passport);
 
 const allowedOrigins = [
   "https://mernstack-netflix-clone-1.onrender.com"
-  
 ];
 
 app.use(cors({
@@ -51,6 +50,59 @@ app.use(session({
 app.use(passport.initialize());
 app.use(passport.session());
 
+// ========== ADD DEBUG MIDDLEWARE HERE ==========
+
+// 1. Request logging middleware (add after passport setup)
+app.use((req, res, next) => {
+  if (req.path.includes('/api/')) {
+    console.log(`📡 API Request: ${req.method} ${req.path}`, {
+      origin: req.get('origin'),
+      contentType: req.get('content-type'),
+      timestamp: new Date().toISOString(),
+      userAgent: req.get('user-agent'),
+      ip: req.ip
+    });
+  }
+  next();
+});
+
+// 2. CORS debugging middleware
+app.use((req, res, next) => {
+  if (req.method === 'OPTIONS') {
+    console.log('🔄 CORS Preflight:', {
+      origin: req.get('origin'),
+      method: req.get('access-control-request-method'),
+      headers: req.get('access-control-request-headers')
+    });
+  }
+  next();
+});
+
+// 3. Environment debug endpoint
+app.use('/debug/env', (req, res) => {
+  const envInfo = {
+    NODE_ENV: process.env.NODE_ENV,
+    PORT: process.env.PORT,
+    MONGO_URI: process.env.MONGO_URI ? 'SET' : 'MISSING',
+    SESSION_SECRET: process.env.SESSION_SECRET ? 'SET' : 'MISSING',
+    timestamp: new Date().toISOString(),
+    hostname: req.hostname,
+    protocol: req.protocol,
+    secure: req.secure,
+    allowedOrigins: allowedOrigins,
+    headers: {
+      host: req.get('host'),
+      origin: req.get('origin'),
+      referer: req.get('referer'),
+      userAgent: req.get('user-agent')
+    }
+  };
+  
+  res.json(envInfo);
+});
+
+// ========== END DEBUG MIDDLEWARE ==========
+
 // API Routes
 app.use("/api/auth", authRoutes);
 app.use("/api/titles", titleRoutes);
@@ -60,8 +112,29 @@ app.get("/", (req, res) => {
   res.send("🌐 Backend Root Route Working!");
 });
 
-app.get("/health", (req, res) => {
-  res.json({ status: "OK", timestamp: new Date().toISOString() });
+app.get("/health", async (req, res) => {
+  const health = {
+    status: 'ok',
+    timestamp: new Date().toISOString(),
+    environment: process.env.NODE_ENV,
+    uptime: process.uptime(),
+    memory: process.memoryUsage(),
+    checks: {
+      mongodb: mongoose.connection.readyState === 1 ? 'connected' : 'disconnected',
+      envVars: {
+        SESSION_SECRET: !!process.env.SESSION_SECRET,
+        MONGO_URI: !!process.env.MONGO_URI,
+      }
+    }
+  };
+
+  try {
+    res.json(health);
+  } catch (error) {
+    health.status = 'error';
+    health.error = error.message;
+    res.status(500).json(health);
+  }
 });
 
 const __dirname = path.resolve();
@@ -89,13 +162,47 @@ if (process.env.NODE_ENV === "production") {
   });
 }
 
+// ========== ADD ERROR HANDLING HERE ==========
+
+// Enhanced error handling middleware (add at the very end, before server start)
+app.use((error, req, res, next) => {
+  console.error('🔥 Application Error:', {
+    timestamp: new Date().toISOString(),
+    method: req.method,
+    url: req.url,
+    error: {
+      message: error.message,
+      stack: error.stack,
+      name: error.name
+    },
+    headers: req.headers,
+    body: req.body
+  });
+  
+  res.status(500).json({
+    error: 'Internal Server Error',
+    timestamp: new Date().toISOString(),
+    message: process.env.NODE_ENV === 'development' ? error.message : 'Something went wrong'
+  });
+});
+
 const PORT = process.env.PORT || 8080;
 
 mongoose.connect(process.env.MONGO_URI)
   .then(() => {
     console.log("✅ MongoDB connected");
+    console.log("🔍 Environment check:", {
+      NODE_ENV: process.env.NODE_ENV,
+      PORT: PORT,
+      MONGO_URI: process.env.MONGO_URI ? 'SET' : 'MISSING',
+      SESSION_SECRET: process.env.SESSION_SECRET ? 'SET' : 'MISSING',
+      allowedOrigins: allowedOrigins
+    });
+    
     app.listen(PORT, () => {
       console.log(`🚀 Server running on http://localhost:${PORT}`);
+      console.log(`🌐 Health check: http://localhost:${PORT}/health`);
+      console.log(`🔍 Debug info: http://localhost:${PORT}/debug/env`);
     });
   })
   .catch((err) => {
